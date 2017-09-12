@@ -1,7 +1,13 @@
 // server.js
 // load the things we need
-var express = require('express');
-var app = express();
+const express = require('express');
+const app = express();
+
+// database
+const urlDatabase = {
+  "b2xVn2": "http://www.lighthouselabs.ca",
+  "9sm5xK": "http://www.google.com"
+};
 
 // set the view engine to ejs
 app.set('view engine', 'ejs');
@@ -10,22 +16,20 @@ app.set('view engine', 'ejs');
 
 // index page
 app.get('/', (req, res) => {
-  var drinks = [
-          { name: 'Bloody Mary', drunkness: 3 },
-          { name: 'Martini', drunkness: 5 },
-          { name: 'Scotch', drunkness: 10 }
-      ];
-      var tagline = "Any code of your own that you haven't looked at for six or more months might as well have been written by someone else.";
-
-      res.render('pages/index', {
-          drinks: drinks,
-          tagline: tagline
-      });
+  res.end('hello!');
 });
 
-// about page
-app.get('/about', (req, res) => {
-    res.render('pages/about');
+// urls page
+app.get('/urls', (req, res) => {
+    let templateVars = { urls: urlDatabase };
+    res.render('urls_index', templateVars);
+});
+
+// single url in shortened form
+app.get("/urls/:id", (req, res) => {
+  let templateVars = { shortURL: req.params.id,
+                        fullURL: urlDatabase[req.params.id] };
+  res.render("urls_show", templateVars);
 });
 
 app.listen(8080);
