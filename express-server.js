@@ -3,7 +3,9 @@
 const express = require('express');
 const app = express();
 const bodyParser = require("body-parser");
+const cookieParser = require('cookie-parser');
 app.use(bodyParser.urlencoded({extended: true}));
+app.use(cookieParser());
 
 const PORT = 8080;
 
@@ -15,8 +17,6 @@ const urlDatabase = {
 
 // set the view engine to ejs
 app.set('view engine', 'ejs');
-
-// use res.render to load up an ejs view file
 
 // index page
 app.get('/', (req, res) => {
@@ -43,7 +43,7 @@ app.get("/urls/:id", (req, res) => {
 // redirect shortURL to longURL
 app.get("/u/:shortURL", (req, res) => {
   let longURL = urlDatabase[req.params.shortURL];
-  res.redirect(301, longURL);
+  res.redirect(302, longURL);
   console.log(`Redirected to ${longURL}`);
 });
 
@@ -52,22 +52,29 @@ app.post("/urls", (req, res) => {
   console.log(req.body);  // debug statement to see POST parameters
   const randomStr = (generateRandomString());
   urlDatabase[randomStr] = req.body.longURL;
-  res.redirect(301, `/urls/${randomStr}`);
+  res.redirect(302, `/urls/${randomStr}`);
   console.log(`redirected to /urls/${randomStr}`);
   });
 
-// Update a URL
-app.post("/urls/:id", (req, res) => {
-  urlDatabase[req.params.id] = req.body.longURL;
-  res.redirect(301, "/urls");
+// Respond to login and set cookie
+app.post("/urls/login", (req, res) => {
+  const username = req.body.username;
+  res.cookie('name', username);
+  res.redirect(302, "/urls");
 })
 
 // Delete URLs
 app.post("/urls/:id/delete", (req, res) => {
-  console.log(req.params.id);
   delete urlDatabase[req.params.id];
-  res.redirect(303, "/urls");
+  res.redirect(302, "/urls");
 })
+
+// Update a URL
+app.post("/urls/:id", (req, res) => {
+  urlDatabase[req.params.id] = req.body.longURL;
+  res.redirect(302, "/urls");
+})
+
 
 app.listen(PORT);
 console.log(`Server listening on port ${PORT}`);
