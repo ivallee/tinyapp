@@ -57,21 +57,24 @@ app.post("/urls", (req, res) => {
   });
 
 // Respond to login and set cookie
-app.post("/urls/login", (req, res) => {
+app.post("/login", (req, res) => {
   const username = req.body.username;
   res.cookie('name', username);
+  console.log('Set cookie!');
   res.redirect(302, "/urls");
 })
 
 // Delete URLs
 app.post("/urls/:id/delete", (req, res) => {
   delete urlDatabase[req.params.id];
+  console.log('URL deleted');
   res.redirect(302, "/urls");
 })
 
 // Update a URL
 app.post("/urls/:id", (req, res) => {
   urlDatabase[req.params.id] = req.body.longURL;
+  console.log('URL updated');
   res.redirect(302, "/urls");
 })
 
