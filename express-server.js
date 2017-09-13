@@ -9,7 +9,7 @@ const PORT = 8080;
 
 // database
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
+  "92xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
 
@@ -33,10 +33,10 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
 
-// single url in shortened form
+// renders page for shortened URL
 app.get("/urls/:id", (req, res) => {
   let templateVars = { shortURL: req.params.id,
-                        fullURL: urlDatabase[req.params.id] };
+                        longURL: urlDatabase[req.params.id] };
   res.render("urls_show", templateVars);
 });
 
@@ -55,6 +55,13 @@ app.post("/urls", (req, res) => {
   res.redirect(301, `/urls/${randomStr}`);
   console.log(`redirected to /urls/${randomStr}`);
   });
+
+// Update a URL
+app.post("/urls/:id", (req, res) => {
+  console.log(req.body.longURL);
+  urlDatabase[req.params.id] = req.body.longURL;
+  console.log(urlDatabase);
+})
 
 // Delete URLs
 app.post("/urls/:id/delete", (req, res) => {
