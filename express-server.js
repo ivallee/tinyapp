@@ -43,9 +43,9 @@ app.post("/urls", (req, res) => {
   console.log(req.body);  // debug statement to see POST parameters
   const randomStr = (generateRandomString());
   urlDatabase[randomStr] = req.body.longURL;
+  res.redirect(301, `/urls/${randomStr}`)
   console.log(urlDatabase);
-  res.send("Ok");         // Respond with 'Ok' (we will replace this)
-});
+  });
 
 app.listen(8080);
 console.log('8080 is the magic port');
