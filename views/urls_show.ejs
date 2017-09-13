@@ -5,7 +5,12 @@
 </head>
 <body style="font-size:20px; padding:50px;">
   <% include ./partials/_header %>
-  <h2>URL</h2>
+  <h2>Your Short URL</h2>
     <p><%= shortURL %> : <%= fullURL %></p>
+    <form action="/urls" method="POST">
+      <label for="longURL">Edit this url:</label>
+      <input id="longURL" type="text" name="longURL" placeholder="http://" style="width: 300px">
+      <input type="submit" value="Submit">
+    </form>
 </body>
 </html>
