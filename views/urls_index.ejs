@@ -8,12 +8,13 @@
   <h2>URL Index</h2>
   <ul>
     <% for (var short in urls) { %>
-      <li><%= urls[short]%> : <%= short %></li>
-      <form method="POST" action="/urls/<%= short %>/delete">
-        <input type="submit" value="Delete URL">
-      </form>
+      <li><%= urls[short]%> : <%= short %>
+        <form method="POST" action="/urls/<%= short %>/delete">
+          <input id= "delete" type="submit" value="Delete URL">
+        </form>
+      </li>
       <% } %>
-      <a href="#">Shorten a URL</a>
   </ul>
+<a href="#">Shorten a URL</a>
 </body>
 </html>
