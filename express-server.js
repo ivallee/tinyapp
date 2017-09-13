@@ -43,7 +43,7 @@ app.get("/urls/:id", (req, res) => {
 // redirect shortURL to longURL
 app.get("/u/:shortURL", (req, res) => {
   let longURL = urlDatabase[req.params.shortURL];
-  res.redirect(302, longURL);
+  res.redirect(301, longURL);
   console.log(`Redirected to ${longURL}`);
 });
 
@@ -52,9 +52,15 @@ app.post("/urls", (req, res) => {
   console.log(req.body);  // debug statement to see POST parameters
   const randomStr = (generateRandomString());
   urlDatabase[randomStr] = req.body.longURL;
-  res.redirect(302, `/urls/${randomStr}`);
+  res.redirect(301, `/urls/${randomStr}`);
   console.log(`redirected to /urls/${randomStr}`);
   });
+
+// Delete URLs
+app.post("/urls/:id/delete", (req, res) => {
+  console.log(req.params.id);
+  delete urlDatabase[req.params.id];
+})
 
 app.listen(PORT);
 console.log(`Server listening on port ${PORT}`);
