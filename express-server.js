@@ -5,6 +5,8 @@ const app = express();
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
 
+const PORT = 8080;
+
 // database
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
@@ -38,17 +40,24 @@ app.get("/urls/:id", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
+// redirect shortURL to longURL
+app.get("/u/:shortURL", (req, res) => {
+  let longURL = urlDatabase[req.params.shortURL];
+  res.redirect(302, longURL);
+  console.log(`Redirected to ${longURL}`);
+});
 
+// Respond to form submission
 app.post("/urls", (req, res) => {
   console.log(req.body);  // debug statement to see POST parameters
   const randomStr = (generateRandomString());
   urlDatabase[randomStr] = req.body.longURL;
-  res.redirect(301, `/urls/${randomStr}`)
-  console.log(urlDatabase);
+  res.redirect(302, `/urls/${randomStr}`);
+  console.log(`redirected to /urls/${randomStr}`);
   });
 
-app.listen(8080);
-console.log('8080 is the magic port');
+app.listen(PORT);
+console.log(`Server listening on port ${PORT}`);
 
 function generateRandomString() {
   const randomStr = Math.floor((1 + Math.random()) * 0x100000).toString(16);
