@@ -60,6 +60,7 @@ app.post("/urls", (req, res) => {
 app.post("/urls/:id/delete", (req, res) => {
   console.log(req.params.id);
   delete urlDatabase[req.params.id];
+  res.redirect(303, "/urls");
 })
 
 app.listen(PORT);
