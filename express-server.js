@@ -20,12 +20,19 @@ app.set('view engine', 'ejs');
 
 // index page
 app.get('/', (req, res) => {
+  let templateVars = {
+      urls: urlDatabase,
+      username: req.cookies['username'],
+    };
   res.end('hello!');
 });
 
 // urls page
 app.get('/urls', (req, res) => {
-    let templateVars = { urls: urlDatabase };
+    let templateVars = {
+      urls: urlDatabase,
+      username: req.cookies['username'],
+    };
     res.render('urls_index', templateVars);
 });
 
@@ -35,8 +42,11 @@ app.get("/urls/new", (req, res) => {
 
 // renders page for shortened URL
 app.get("/urls/:id", (req, res) => {
-  let templateVars = { shortURL: req.params.id,
-                        longURL: urlDatabase[req.params.id] };
+  let templateVars = {
+    shortURL: req.params.id,
+    longURL: urlDatabase[req.params.id],
+    username: req.cookies['username']
+  };
   res.render("urls_show", templateVars);
 });
 
@@ -59,7 +69,7 @@ app.post("/urls", (req, res) => {
 // Respond to login and set cookie
 app.post("/login", (req, res) => {
   const username = req.body.username;
-  res.cookie('name', username);
+  res.cookie('username', username);
   console.log('Set cookie!');
   res.redirect(302, "/urls");
 })
