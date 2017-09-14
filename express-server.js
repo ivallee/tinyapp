@@ -32,12 +32,14 @@ const users = {
 
 app.use((req, res, next) => {
   console.log(req.cookies)
-  if (req.cookies.user_id) {
-    res.locals.username = users[req.cookies.user_id].email;
-    console.log(res.locals.user);
+  const userid = req.cookies.user_id;
+  if (userid && userid in users) {
+    res.locals.username = users[userid].email;
   } else {
     res.locals.username = undefined;
   }
+  res.locals.urls = urlDatabase;
+  res.locals.users = users;
   next();
 })
 
@@ -121,7 +123,7 @@ app.post("/login", (req, res) => {
 
 // Respond to logout
 app.post("/logout", (req, res) => {
-  res.clearCookie('username');
+  res.clearCookie('user_id');
   console.log('Cleared cookie');
   res.redirect(302, '/urls');
 })
