@@ -2,8 +2,9 @@
 <h1>Isaac's TinyApp</h1>
 <% if (username) { %>
    <p><%= username %> is logged in</p>
-   <form method="POST" action="/logout">
+    <form method="POST" action="/logout">
         <input type="submit" name="submit" value="Logout">
+    </form>
  <% } else { %>
     <form method="POST" action="/login">
         <input id="login" type="text" name="username" placeholder="username">
