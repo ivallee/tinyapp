@@ -1,13 +1,15 @@
 <!-- views/partials/header.ejs -->
 <h1>Isaac's TinyApp</h1>
-<form method="POST" action="/login">
-    <input id="login" type="text" name="username" placeholder="username">
-    <input type="submit" name="submit" value="Log in">
-    <p><%= username %> is logged in</p>
-</form>
-
-
-
+<% if (username) { %>
+   <p><%= username %> is logged in</p>
+   <form method="POST" action="/logout">
+        <input type="submit" name="submit" value="Logout">
+ <% } else { %>
+    <form method="POST" action="/login">
+        <input id="login" type="text" name="username" placeholder="username">
+        <input type="submit" name="submit" value="Log in">
+    </form>
+<% } %>
 
 
 
