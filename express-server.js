@@ -45,6 +45,9 @@ app.get("/urls/new", (req, res) => {
 
 // renders page for shortened URL
 app.get("/urls/:id", (req, res) => {
+  if (!urlDatabase[req.params.id]) {
+    return res.redirect('/urls/new');
+  }
   let templateVars = {
     shortURL: req.params.id,
     longURL: urlDatabase[req.params.id],
