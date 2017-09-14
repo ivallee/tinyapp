@@ -16,6 +16,19 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+// users database
+const users = {
+  "randomID" : {
+    id: 'randomID',
+    email: 'user1@example.com',
+    password: 'p0rkch0ps4ndwiches'
+  },
+  "randomID2" : {
+    id: 'randomID2',
+    email: 'user2@example.com',
+    password: 'sportsteamroolz'
+  }
+}
 
 function generateRandomString() {
   const randomStr = Math.floor((1 + Math.random()) * 0x100000).toString(16);
@@ -23,11 +36,16 @@ function generateRandomString() {
 }
 // index page
 app.get('/', (req, res) => {
+  res.redirect('/urls');
+});
+
+// Registration page
+app.get('/register', (req, res) => {
   let templateVars = {
       urls: urlDatabase,
       username: req.cookies['username'],
     };
-  res.redirect('/urls');
+  res.render('urls_register', templateVars);
 });
 
 // URL list page
