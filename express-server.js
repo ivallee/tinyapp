@@ -32,7 +32,7 @@ const users = {
 
 function generateRandomString() {
   const randomStr = Math.floor((1 + Math.random()) * 0x100000).toString(16);
-  return randomStr;
+  return 'u' + randomStr;
 }
 // index page
 app.get('/', (req, res) => {
@@ -41,26 +41,19 @@ app.get('/', (req, res) => {
 
 // Registration page
 app.get('/register', (req, res) => {
-  let templateVars = {
-      username: req.cookies['username'],
-    };
+  const templateVars = users;
   res.render('urls_register', templateVars);
 });
 
 // URL list page
 app.get('/urls', (req, res) => {
-    let templateVars = {
-      urls: urlDatabase,
-      username: req.cookies['username'],
-    };
+  const templateVars = users;
     res.render('urls_index', templateVars);
 });
 
 // Shorten url page
 app.get("/urls/new", (req, res) => {
-  let templateVars = {
-    username: req.cookies['username']
-  }
+  const templateVars = users;
   res.render("urls_new", templateVars);
 });
 
@@ -69,11 +62,7 @@ app.get("/urls/:id", (req, res) => {
   if (!urlDatabase[req.params.id]) {
     return res.redirect('/urls/new');
   }
-  let templateVars = {
-    shortURL: req.params.id,
-    longURL: urlDatabase[req.params.id],
-    username: req.cookies['username']
-  };
+  const templateVars = users;
   res.render("urls_show", templateVars);
 });
 
@@ -86,19 +75,28 @@ app.get("/u/:shortURL", (req, res) => {
 
 // Handles registration
 app.post('/register', (req, res) => {
-  console.log(req.body);
   const randomid = generateRandomString();
-  /////////////////////////////////////////////////////////////////////// This is where you were!!!!!!!!!!
+  if (req.body.email === '' || req.body.password === '') {
+    console.log('No email or no password');
+    return res.sendStatus(400);
+  }
+  for (key in users) {
+    if (users[key].email === req.body.email) {
+      console.log('user already exists');
+      return res.sendStatus(400);
+    }
+  }
   users[randomid] = {
     id: randomid,
     email: req.body.email,
     password: req.body.password
   };
-  console.log(users);
+  res.cookie('user_id', randomid);
+  res.redirect('/urls');
 });
 
 
-// Respond to form submission
+// Respond to new URL submission
 app.post("/urls", (req, res) => {
   const randomid = (generateRandomString());
   urlDatabase[randomid] = req.body.longURL;
