@@ -24,7 +24,7 @@ app.get('/', (req, res) => {
       urls: urlDatabase,
       username: req.cookies['username'],
     };
-  res.end('hello!');
+  res.redirect('/urls');
 });
 
 // urls page
