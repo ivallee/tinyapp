@@ -31,7 +31,6 @@ const users = {
 }
 
 app.use((req, res, next) => {
-  console.log(req.cookies)
   const userid = req.cookies.user_id;
   if (userid && userid in users) {
     res.locals.username = users[userid].email;
@@ -72,7 +71,11 @@ app.get("/urls/:id", (req, res) => {
   if (!urlDatabase[req.params.id]) {
     return res.redirect('/urls/new');
   }
-  res.render("urls_show");
+  const templateVars = {
+    longURL: urlDatabase[req.params.id],
+    shortURL: req.params.id,
+  }
+  res.render("urls_show", templateVars);
 });
 
 // redirect shortURL to longURL
@@ -130,6 +133,7 @@ app.post("/logout", (req, res) => {
 
 // Delete URLs
 app.post("/urls/:id/delete", (req, res) => {
+  console.log(req.params.id)
   delete urlDatabase[req.params.id];
   console.log('URL deleted');
   res.redirect(302, "/urls");
