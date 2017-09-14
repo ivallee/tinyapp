@@ -37,7 +37,10 @@ app.get('/urls', (req, res) => {
 });
 
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+  let templateVars = {
+    username: req.cookies['username']
+  }
+  res.render("urls_new", templateVars);
 });
 
 // renders page for shortened URL
@@ -70,8 +73,15 @@ app.post("/urls", (req, res) => {
 app.post("/login", (req, res) => {
   const username = req.body.username;
   res.cookie('username', username);
-  console.log('Set cookie!');
+  console.log('Set cookie');
   res.redirect(302, "/urls");
+})
+
+// Respond to logout
+app.post("/logout", (req, res) => {
+  res.clearCookie('username');
+  console.log('Cleared cookie');
+  res.redirect(302, '/urls');
 })
 
 // Delete URLs
