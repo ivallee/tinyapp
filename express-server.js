@@ -6,6 +6,7 @@ const bodyParser = require("body-parser");
 const cookieParser = require('cookie-parser');
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
+app.set('view engine', 'ejs');
 
 const PORT = 8080;
 
@@ -15,9 +16,11 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
-// set the view engine to ejs
-app.set('view engine', 'ejs');
 
+function generateRandomString() {
+  const randomStr = Math.floor((1 + Math.random()) * 0x100000).toString(16);
+  return randomStr;
+}
 // index page
 app.get('/', (req, res) => {
   let templateVars = {
@@ -27,7 +30,7 @@ app.get('/', (req, res) => {
   res.redirect('/urls');
 });
 
-// urls page
+// URL list page
 app.get('/urls', (req, res) => {
     let templateVars = {
       urls: urlDatabase,
@@ -36,6 +39,7 @@ app.get('/urls', (req, res) => {
     res.render('urls_index', templateVars);
 });
 
+// Shorten url page
 app.get("/urls/new", (req, res) => {
   let templateVars = {
     username: req.cookies['username']
@@ -101,11 +105,5 @@ app.post("/urls/:id", (req, res) => {
   res.redirect(302, "/urls");
 })
 
-
 app.listen(PORT);
 console.log(`Server listening on port ${PORT}`);
-
-function generateRandomString() {
-  const randomStr = Math.floor((1 + Math.random()) * 0x100000).toString(16);
-  return randomStr;
-}
