@@ -30,6 +30,17 @@ const users = {
   }
 }
 
+app.use((req, res, next) => {
+  console.log(req.cookies)
+  if (req.cookies.user_id) {
+    res.locals.username = users[req.cookies.user_id].email;
+    console.log(res.locals.user);
+  } else {
+    res.locals.username = undefined;
+  }
+  next();
+})
+
 function generateRandomString() {
   const randomStr = Math.floor((1 + Math.random()) * 0x100000).toString(16);
   return 'u' + randomStr;
@@ -41,20 +52,17 @@ app.get('/', (req, res) => {
 
 // Registration page
 app.get('/register', (req, res) => {
-  const templateVars = users;
-  res.render('urls_register', templateVars);
+  res.render('urls_register');
 });
 
 // URL list page
 app.get('/urls', (req, res) => {
-  const templateVars = users;
-    res.render('urls_index', templateVars);
+    res.render('urls_index');
 });
 
 // Shorten url page
 app.get("/urls/new", (req, res) => {
-  const templateVars = users;
-  res.render("urls_new", templateVars);
+  res.render("urls_new");
 });
 
 // renders page for shortened URL
@@ -62,8 +70,7 @@ app.get("/urls/:id", (req, res) => {
   if (!urlDatabase[req.params.id]) {
     return res.redirect('/urls/new');
   }
-  const templateVars = users;
-  res.render("urls_show", templateVars);
+  res.render("urls_show");
 });
 
 // redirect shortURL to longURL
