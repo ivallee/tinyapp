@@ -42,7 +42,6 @@ app.get('/', (req, res) => {
 // Registration page
 app.get('/register', (req, res) => {
   let templateVars = {
-      urls: urlDatabase,
       username: req.cookies['username'],
     };
   res.render('urls_register', templateVars);
@@ -85,13 +84,26 @@ app.get("/u/:shortURL", (req, res) => {
   console.log(`Redirected to ${longURL}`);
 });
 
+// Handles registration
+app.post('/register', (req, res) => {
+  console.log(req.body);
+  const randomid = generateRandomString();
+  /////////////////////////////////////////////////////////////////////// This is where you were!!!!!!!!!!
+  users[randomid] = {
+    id: randomid,
+    email: req.body.email,
+    password: req.body.password
+  };
+  console.log(users);
+});
+
+
 // Respond to form submission
 app.post("/urls", (req, res) => {
-  console.log(req.body);  // debug statement to see POST parameters
-  const randomStr = (generateRandomString());
-  urlDatabase[randomStr] = req.body.longURL;
-  res.redirect(302, `/urls/${randomStr}`);
-  console.log(`redirected to /urls/${randomStr}`);
+  const randomid = (generateRandomString());
+  urlDatabase[randomid] = req.body.longURL;
+  res.redirect(302, `/urls/${randomid}`);
+  console.log(`redirected to /urls/${randomid}`);
   });
 
 // Respond to login and set cookie
