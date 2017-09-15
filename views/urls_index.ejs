@@ -8,16 +8,17 @@
   <h2>Your URLS</h2>
   <ul>
     <% for (let short in myurls) { %>
-      <li><%= myurls[short].URL%> : <%= myurls[short].id %>
+      <li><%= myurls[short].URL%>: <a href="/u/<%= myurls[short].id %>"><%= myurls[short].id %></a>
         <form method="POST" action="/urls/<%= myurls[short].id %>/delete">
           <input id= "delete" type="submit" value="Delete URL">
         </form>
-        <form action="/urls/<%= short %>">
-          <input type="submit" value="Edit" />
+        <form action="/urls/<%= myurls[short].id %>">
+          <input type="submit" value="Edit">
         </form>
       </li>
       <% } %>
   </ul>
-<a href="/urls/new">Shorten a URL</a>
+<a href="/urls/new">Create new short URL</a>
+<% include ./partials/_footer %>
 </body>
 </html>
