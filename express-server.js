@@ -4,6 +4,7 @@ const express = require('express');
 const app = express();
 const bodyParser = require("body-parser");
 const cookieParser = require('cookie-parser');
+const bcrypt = require('bcrypt');
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
 app.set('view engine', 'ejs');
@@ -65,7 +66,7 @@ function urlsForUser(id) {
 
 // index page
 app.get('/', (req, res) => {
-  res.redirect('/urls');
+  res.redirect('/register');
 });
 
 // Registration page
@@ -81,6 +82,11 @@ app.get('/urls', (req, res) => {
   return res.send('For registered users only. Please register or Log in');
   }
   const myurls = urlsForUser(req.cookies['user_id']);
+  // const templateVars = {
+  //   myurls: myurls,
+  //   shorturl:
+  // }
+  // console.log(templateVars);
   req.cookies['user_id'];
   res.render('urls_index', {myurls: myurls});
 });
@@ -116,7 +122,6 @@ app.get("/urls/:id", (req, res) => {
 
 // redirect shortURL to longURL
 app.get("/u/:shortURL", (req, res) => {
-  console.log(urlDatabase[req.params.shortURL]);
   const longURL = urlDatabase[req.params.shortURL]['URL'];
   res.redirect(302, longURL);
   console.log(`Redirected to ${longURL}`);
@@ -138,8 +143,9 @@ app.post('/register', (req, res) => {
   users[randomid] = {
     id: randomid,
     email: req.body.email,
-    password: req.body.password
+    password: bcrypt.hashSync(req.body.password, 10)
   };
+  console.log(users);
   res.cookie('user_id', randomid);
   res.redirect('/urls');
 });
@@ -157,7 +163,7 @@ app.post("/urls", (req, res) => {
 app.post("/login", (req, res) => {
   for (key in users) {
     if (users[key].email == req.body.email) {
-      if (users[key].password === req.body.password) {
+      if (bcrypt.compareSync(req.body.password, users[key].password)) {
         console.log('login successful!');
         res.cookie('user_id', users[key].id);
         return res.redirect('/urls');
