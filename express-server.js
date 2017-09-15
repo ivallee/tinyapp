@@ -108,7 +108,6 @@ app.get('/login', (req, res) => {
 app.get("/urls/new", (req, res) => {
   req.session['user_id'];
   if (!req.session['user_id']) {
-    console.log('No dice bro');
     return res.redirect('/login');
   }
   res.render("urls_new");
@@ -116,8 +115,11 @@ app.get("/urls/new", (req, res) => {
 
 // renders page for shortened URL
 app.get("/urls/:id", (req, res) => {
-  if (!urlDatabase[req.params.id]) {
-    return res.redirect('/urls/new');
+  if (!req.session['user_id']) {
+  return res.render('urls_usersonly');
+  }
+  if (req.params.id !== urlDatabase[req.params.id]) {
+  return res.send('Sorry, no shortURL here!');
   }
   const templateVars = {
     longURL: urlDatabase[req.params.id].URL,
