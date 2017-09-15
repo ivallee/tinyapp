@@ -25,12 +25,12 @@ const urlDatabase = {
 // users database
 const users = {
   "4f2343" : {
-    id: 'randomID',
+    id: '4f2343',
     email: 'user1@example.com',
     password: 'cows'
   },
   "234234d" : {
-    id: 'randomID2',
+    id: '234234d',
     email: 'user2@example.com',
     password: 'pigs'
   }
@@ -89,6 +89,10 @@ app.get("/urls/new", (req, res) => {
 app.get("/urls/:id", (req, res) => {
   if (!urlDatabase[req.params.id]) {
     return res.redirect('/urls/new');
+  }
+ if (!req.cookies['user_id']) {
+    console.log('No dice bro');
+    return res.redirect('/login');
   }
   const templateVars = {
     longURL: urlDatabase[req.params.id].URL,
@@ -161,7 +165,10 @@ app.post("/logout", (req, res) => {
 
 // Delete URLs
 app.post("/urls/:id/delete", (req, res) => {
-  console.log(req.params.id)
+  if (!req.cookies['user_id']) {
+    console.log('No dice bro');
+    return res.redirect('/login');
+  }
   delete urlDatabase[req.params.id];
   console.log('URL deleted');
   res.redirect(302, "/urls");
