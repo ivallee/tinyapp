@@ -7,8 +7,8 @@
   <% include partials/_header %>
   <h2>Your URLS</h2>
   <ul>
-    <% for (var short in urls) { %>
-      <li><%= urls[short].URL%> : <%= short %>
+    <% for (var short in myurls) { %>
+      <li><%= myurls[short].URL%> : <%= myurls[short].userID %>
         <form method="POST" action="/urls/<%= short %>/delete">
           <input id= "delete" type="submit" value="Delete URL">
         </form>

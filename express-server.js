@@ -57,12 +57,12 @@ function urlsForUser(id) {
  const output = [];
  for (shorturl in urlDatabase) {
   if (urlDatabase[shorturl].userID === id) {
-    output.push(shorturl);
+    output.push(urlDatabase[shorturl]);
   }
  }
  return output;
 }
-/////////////////////////////////////////////////////THIS IS WHERE YOU
+
 // index page
 app.get('/', (req, res) => {
   res.redirect('/urls');
@@ -80,8 +80,9 @@ app.get('/urls', (req, res) => {
   console.log('No dice bro');
   return res.send('For registered users only. Please register or Log in');
   }
+  const myurls = urlsForUser(req.cookies['user_id']);
   req.cookies['user_id'];
-  res.render('urls_index');
+  res.render('urls_index', {myurls: myurls});
 });
 
 // Login page
@@ -147,7 +148,7 @@ app.post('/register', (req, res) => {
 // Respond to new URL submission
 app.post("/urls", (req, res) => {
   const randomid = (generateRandomString());
-  urlDatabase[randomid] = { URL: req.body.longURL, userID: '' }
+  urlDatabase[randomid] = { URL: req.body.longURL, userID: req.cookies['user_id'] }
   res.redirect(302, `/urls/${randomid}`);
   console.log(`redirected to /urls/${randomid}`);
   });
