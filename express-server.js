@@ -12,21 +12,27 @@ const PORT = 8080;
 
 // database
 const urlDatabase = {
-  "92xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  "92xVn2": {
+    URL: "http://www.lighthouselabs.ca",
+    userID: ''
+  },
+  "9sm5xK": {
+    URL: "http://www.google.com",
+    userID: ''
+  }
 };
 
 // users database
 const users = {
-  "randomID" : {
+  "4f2343" : {
     id: 'randomID',
     email: 'user1@example.com',
     password: 'cows'
   },
-  "randomID2" : {
+  "234234d" : {
     id: 'randomID2',
     email: 'user2@example.com',
-    password: 'sportsteamroolz'
+    password: 'pigs'
   }
 }
 
@@ -72,6 +78,10 @@ app.get('/login', (req, res) => {
 // Shorten url page
 app.get("/urls/new", (req, res) => {
   req.cookies['user_id'];
+  if (!req.cookies['user_id']) {
+    console.log('No dice bro');
+    return res.redirect('/login');
+  }
   res.render("urls_new");
 });
 
@@ -81,7 +91,7 @@ app.get("/urls/:id", (req, res) => {
     return res.redirect('/urls/new');
   }
   const templateVars = {
-    longURL: urlDatabase[req.params.id],
+    longURL: urlDatabase[req.params.id].URL,
     shortURL: req.params.id,
   }
   req.cookies['user_id'];
@@ -90,7 +100,8 @@ app.get("/urls/:id", (req, res) => {
 
 // redirect shortURL to longURL
 app.get("/u/:shortURL", (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL];
+  console.log(urlDatabase[req.params.shortURL]);
+  const longURL = urlDatabase[req.params.shortURL]['URL'];
   res.redirect(302, longURL);
   console.log(`Redirected to ${longURL}`);
 });
@@ -121,7 +132,7 @@ app.post('/register', (req, res) => {
 // Respond to new URL submission
 app.post("/urls", (req, res) => {
   const randomid = (generateRandomString());
-  urlDatabase[randomid] = req.body.longURL;
+  urlDatabase[randomid] = { URL: req.body.longURL, userID: '' }
   res.redirect(302, `/urls/${randomid}`);
   console.log(`redirected to /urls/${randomid}`);
   });
@@ -156,7 +167,7 @@ app.post("/urls/:id/delete", (req, res) => {
   res.redirect(302, "/urls");
 })
 
-// Update a URL
+// Edit a URL
 app.post("/urls/:id", (req, res) => {
   urlDatabase[req.params.id] = req.body.longURL;
   console.log('URL updated');
