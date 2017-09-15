@@ -14,11 +14,11 @@ const PORT = 8080;
 const urlDatabase = {
   "92xVn2": {
     URL: "http://www.lighthouselabs.ca",
-    userID: ''
+    userID: '4f2343'
   },
   "9sm5xK": {
     URL: "http://www.google.com",
-    userID: ''
+    userID: '234234d'
   }
 };
 
@@ -52,6 +52,17 @@ function generateRandomString() {
   const randomStr = Math.floor((1 + Math.random()) * 0x100000).toString(16);
   return 'u' + randomStr;
 }
+
+function urlsForUser(id) {
+ const output = [];
+ for (shorturl in urlDatabase) {
+  if (urlDatabase[shorturl].userID === id) {
+    output.push(shorturl);
+  }
+ }
+ return output;
+}
+/////////////////////////////////////////////////////THIS IS WHERE YOU
 // index page
 app.get('/', (req, res) => {
   res.redirect('/urls');
@@ -63,10 +74,14 @@ app.get('/register', (req, res) => {
   res.render('urls_register');
 });
 
-// URL list page
+// URL index page
 app.get('/urls', (req, res) => {
-    req.cookies['user_id'];
-    res.render('urls_index');
+  if (!req.cookies['user_id']) {
+  console.log('No dice bro');
+  return res.send('For registered users only. Please register or Log in');
+  }
+  req.cookies['user_id'];
+  res.render('urls_index');
 });
 
 // Login page
@@ -89,10 +104,6 @@ app.get("/urls/new", (req, res) => {
 app.get("/urls/:id", (req, res) => {
   if (!urlDatabase[req.params.id]) {
     return res.redirect('/urls/new');
-  }
- if (!req.cookies['user_id']) {
-    console.log('No dice bro');
-    return res.redirect('/login');
   }
   const templateVars = {
     longURL: urlDatabase[req.params.id].URL,
@@ -147,7 +158,6 @@ app.post("/login", (req, res) => {
     if (users[key].email == req.body.email) {
       if (users[key].password === req.body.password) {
         console.log('login successful!');
-        console.log('password successful');
         res.cookie('user_id', users[key].id);
         return res.redirect('/urls');
       }
