@@ -14,10 +14,12 @@ const PORT = 8080;
 // database
 const urlDatabase = {
   "92xVn2": {
+    id: "92xVn2",
     URL: "http://www.lighthouselabs.ca",
     userID: '4f2343'
   },
   "9sm5xK": {
+    id: "9sm5xK",
     URL: "http://www.google.com",
     userID: '234234d'
   }
@@ -82,13 +84,9 @@ app.get('/urls', (req, res) => {
   return res.send('For registered users only. Please register or Log in');
   }
   const myurls = urlsForUser(req.cookies['user_id']);
-  // const templateVars = {
-  //   myurls: myurls,
-  //   shorturl:
-  // }
-  // console.log(templateVars);
+
   req.cookies['user_id'];
-  res.render('urls_index', {myurls: myurls});
+  res.render('urls_index', {myurls: urlsForUser(req.cookies['user_id'])});
 });
 
 // Login page
@@ -154,7 +152,7 @@ app.post('/register', (req, res) => {
 // Respond to new URL submission
 app.post("/urls", (req, res) => {
   const randomid = (generateRandomString());
-  urlDatabase[randomid] = { URL: req.body.longURL, userID: req.cookies['user_id'] }
+  urlDatabase[randomid] = { id: randomid, URL: req.body.longURL, userID: req.cookies['user_id'] }
   res.redirect(302, `/urls/${randomid}`);
   console.log(`redirected to /urls/${randomid}`);
   });

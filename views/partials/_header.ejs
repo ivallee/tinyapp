@@ -1,6 +1,7 @@
 <!-- views/partials/header.ejs -->
 <h1>Isaac's URL Shortener</h1>
 <a href="/register">Register</a>
+<a href="/urls">Your URLs</a>
 <% if (username) { %>
    <p><%= username %> is logged in</p>
     <form method="POST" action="/logout">
