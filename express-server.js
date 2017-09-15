@@ -1,5 +1,3 @@
-// server.js
-// load the things we need
 const express = require('express');
 const app = express();
 const bodyParser = require("body-parser");
@@ -11,7 +9,7 @@ app.set('view engine', 'ejs');
 
 const PORT = 8080;
 
-// database
+// URL database
 const urlDatabase = {
   "92xVn2": {
     id: "92xVn2",
@@ -30,12 +28,12 @@ const users = {
   "4f2343" : {
     id: '4f2343',
     email: 'user1@example.com',
-    password: 'cows'
+    password: bcrypt.hashSync('cows', 10)
   },
   "234234d" : {
     id: '234234d',
     email: 'user2@example.com',
-    password: 'pigs'
+    password: bcrypt.hashSync('pigs', 10)
   }
 }
 
@@ -143,7 +141,6 @@ app.post('/register', (req, res) => {
     email: req.body.email,
     password: bcrypt.hashSync(req.body.password, 10)
   };
-  console.log(users);
   res.cookie('user_id', randomid);
   res.redirect('/urls');
 });
