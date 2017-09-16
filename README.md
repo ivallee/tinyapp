@@ -8,12 +8,12 @@
 
 
 ### Dependencies:
-*bcrypt
-*body-parser
-*cookie-session
-*ejs
-*express
+* bcrypt
+* body-parser
+* cookie-session
+* ejs
+* express
 
 ### Get Started
-*Install all dependencies using npm install
-*Run the web server by running `node express_server.js`
+* Install all dependencies using npm install
+* Run the web server by running `node express_server.js`
