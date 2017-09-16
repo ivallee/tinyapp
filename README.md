@@ -3,8 +3,8 @@
 
 ## Final Product
 
-!["screen description"](#)
-!["screen description"](#)
+!["Login screen"](tinyapp/docs/url_login.png)
+!["URL index"](tinyapp/docs/url_page.png)
 
 
 ### Dependencies:
@@ -13,7 +13,6 @@
 *cookie-session
 *ejs
 *express
-
 
 ### Get Started
 *Install all dependencies using npm install
