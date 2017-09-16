@@ -132,11 +132,11 @@ app.get("/urls/:id", (req, res) => {
 
 // Redirect shortURL to longURL
 app.get("/u/:shortURL", (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL]['URL'];///////////////add 404 check
-  if (!longURL) {
-    res.status(404).send('Not Found');/////////////// Fix
+  if (req.params.shortURL in urlDatabase) {
+  const longURL = urlDatabase[req.params.shortURL]['URL'];
+  return res.redirect(302, longURL);
   }
-  res.redirect(302, longURL);
+  res.status(404).send('Not Found');
 });
 
 // Handles registration
@@ -191,20 +191,21 @@ app.post("/logout", (req, res) => {
 
 // Edit URLs
 app.post("/urls/:id", (req, res) => {
-  if (!req.session['user_id']) {
-    return res.render('urls_usersonly');
+  if (req.session['user_id'] == urlDatabase[req.params.id].userID) {
+    urlDatabase[req.params.id].URL = req.body.longURL;
+    return res.redirect(302, "/urls");
   }
-  urlDatabase[req.params.id].URL = req.body.longURL;///////////////users can only edit their own urls
-  res.redirect(302, "/urls");
+  res.status(401, 'Not authorized');
 });
 
 // Delete URLs
 app.post("/urls/:id/delete", (req, res) => {
-  if (!req.session['user_id']) {
-    return res.render('urls_usersonly');/////////////////////// users can only delete
+  if (req.session['user_id'] == urlDatabase[req.params.id].userID) {
+    urlDatabase[req.params.id].URL = req.body.longURL;
+    delete urlDatabase[req.params.id];
+    return res.redirect(302, "/urls");
   }
-  delete urlDatabase[req.params.id];
-  res.redirect(302, "/urls");
+  res.status(401, 'Not authorized');
 });
 
 
