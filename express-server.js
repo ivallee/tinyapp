@@ -180,7 +180,7 @@ app.post("/login", (req, res) => {
       }
     }
   }
-  res.sendStatus(401).send('Please enter a valid username and password');
+  res.status(401).send('Please enter a valid username and password');
 });
 
 // Respond to logout
@@ -191,11 +191,12 @@ app.post("/logout", (req, res) => {
 
 // Edit URLs
 app.post("/urls/:id", (req, res) => {
-  if (req.session['user_id'] == urlDatabase[req.params.id].userID) {
+  if (req.session['user_id'] === urlDatabase[req.params.id].userID) {
     urlDatabase[req.params.id].URL = req.body.longURL;
     return res.redirect(302, "/urls");
+  } else {
+    return res.status(401).send('Not authorized');
   }
-  res.status(401, 'Not authorized');
 });
 
 // Delete URLs
@@ -204,8 +205,9 @@ app.post("/urls/:id/delete", (req, res) => {
     urlDatabase[req.params.id].URL = req.body.longURL;
     delete urlDatabase[req.params.id];
     return res.redirect(302, "/urls");
+  } else {
+    res.status(401).send('Not authorized');
   }
-  res.status(401, 'Not authorized');
 });
 
 
