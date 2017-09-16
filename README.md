@@ -1,6 +1,11 @@
 # 'TinyApp' URL Shortener
+### A simple javascript URL shortener using Node.JS, express, and EJS. It allows users to register and shorten URLS
 
-## A simple javascript URL shortener using Node.JS, express, and EJS.
+## Final Product
+
+!["screen description"](#)
+!["screen description"](#)
+
 
 ### Dependencies:
 *bcrypt
@@ -8,3 +13,8 @@
 *cookie-session
 *ejs
 *express
+
+
+### Get Started
+*Install all dependencies using npm install
+*Run the web server by running `node express_server.js`
