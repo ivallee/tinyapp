@@ -44,7 +44,7 @@ app.use(cookieSession({
 }));
 
 app.use((req, res, next) => {
-  const userid = req.session.user_id;
+  const userid = req.session.uid;
   res.locals.isLoggedIn = false;
   if (userid && userid in users) {
     res.locals.username = users[userid].email;
@@ -72,7 +72,7 @@ function urlsForUser(id) {
 
 // Index page
 app.get('/', (req, res) => {
-  if (!req.session['user_id']) {
+  if (!req.session['uid']) {
     return res.redirect('/login');
   }
   res.redirect("/urls");
@@ -80,7 +80,7 @@ app.get('/', (req, res) => {
 
 // Registration page
 app.get('/register', (req, res) => {
-  if (req.session['user_id']) {
+  if (req.session['uid']) {
     return res.redirect('/urls');
   }
   res.render('urls_register');
@@ -88,17 +88,17 @@ app.get('/register', (req, res) => {
 
 // URL index page
 app.get('/urls', (req, res) => {
-  if (!req.session['user_id']) {
+  if (!req.session['uid']) {
     return res.status(401).send('Please log in or register to view this page');
   }
   res.render('urls_index', {
-    myurls: urlsForUser(req.session['user_id'])
+    myurls: urlsForUser(req.session['uid'])
   });
 });
 
 // Login page
 app.get('/login', (req, res) => {
-  if (req.session['user_id']) {
+  if (req.session['uid']) {
     return res.redirect('/urls');
   }
   res.render('urls_login');
@@ -106,7 +106,7 @@ app.get('/login', (req, res) => {
 
 // Shorten url page
 app.get("/urls/new", (req, res) => {
-  if (!req.session['user_id']) {
+  if (!req.session['uid']) {
     return res.redirect('/login');
   }
   res.render("urls_new");
@@ -117,10 +117,10 @@ app.get("/urls/:id", (req, res) => {
   if (!urlDatabase[req.params.id]) {
     return res.status(404).send('Not Found');
   }
-  if (!req.session['user_id']) {
+  if (!req.session['uid']) {
     return res.status(401).send('Please log in or register to view this page');
   }
-  if (req.session['user_id'] !== urlDatabase[req.params.id].userID) {
+  if (req.session['uid'] !== urlDatabase[req.params.id].userID) {
     return res.status(401).send('This short URL does not belong to you');
   }
   const templateVars = {
@@ -133,8 +133,8 @@ app.get("/urls/:id", (req, res) => {
 // Redirect shortURL to longURL
 app.get("/u/:shortURL", (req, res) => {
   if (req.params.shortURL in urlDatabase) {
-  const longURL = urlDatabase[req.params.shortURL]['URL'];
-  return res.redirect(302, longURL);
+    const longURL = urlDatabase[req.params.shortURL]['URL'];
+    return res.redirect(302, longURL);
   }
   res.status(404).send('Not Found');
 });
@@ -142,7 +142,7 @@ app.get("/u/:shortURL", (req, res) => {
 // Handles registration
 app.post('/register', (req, res) => {
   if (!req.body.email || !req.body.password) {
-    return res.status(400, 'Please enter a valid email and password');
+    return res.status(400).send('Please enter a valid email and password');
   }
   for (const key in users) {
     if (users[key].email === req.body.email) {
@@ -155,27 +155,27 @@ app.post('/register', (req, res) => {
     email: req.body.email,
     password: bcrypt.hashSync(req.body.password, 10)
   };
-  req.session.user_id = randomid;
+  req.session.uid = randomid;
   res.redirect('/urls');
 });
 
 
 // Respond to new URL submission
 app.post("/urls", (req, res) => {
-  if (!req.session['user_id']) {
+  if (!req.session['uid']) {
     return res.status(401, 'Please log in or register to submit a URL');
   }
   const randomid = generateRandomString();
-  urlDatabase[randomid] = { id: randomid, URL: req.body.longURL, userID: req.session['user_id'] };
+  urlDatabase[randomid] = { id: randomid, URL: req.body.longURL, userID: req.session['uid'] };
   res.redirect(302, `/urls/${randomid}`);
 });
 
 // Respond to login and set cookie
 app.post("/login", (req, res) => {
   for (const key in users) {
-    if (users[key].email == req.body.email) {
+    if (users[key].email === req.body.email) {
       if (bcrypt.compareSync(req.body.password, users[key].password)) {
-        req.session.user_id = users[key].id;
+        req.session.uid = users[key].id;
         return res.redirect('/urls');
       }
     }
@@ -191,7 +191,7 @@ app.post("/logout", (req, res) => {
 
 // Edit URLs
 app.post("/urls/:id", (req, res) => {
-  if (req.session['user_id'] === urlDatabase[req.params.id].userID) {
+  if (req.session['uid'] === urlDatabase[req.params.id].userID) {
     urlDatabase[req.params.id].URL = req.body.longURL;
     return res.redirect(302, "/urls");
   } else {
@@ -201,7 +201,7 @@ app.post("/urls/:id", (req, res) => {
 
 // Delete URLs
 app.post("/urls/:id/delete", (req, res) => {
-  if (req.session['user_id'] == urlDatabase[req.params.id].userID) {
+  if (req.session['uid'] === urlDatabase[req.params.id].userID) {
     urlDatabase[req.params.id].URL = req.body.longURL;
     delete urlDatabase[req.params.id];
     return res.redirect(302, "/urls");

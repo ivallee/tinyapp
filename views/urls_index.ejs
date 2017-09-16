@@ -8,7 +8,7 @@
   <h2>Your URLS</h2>
   <ul>
     <% for (let short in myurls) { %>
-      <li><%= myurls[short].URL%>: <a href="/u/<%= myurls[short].id %>"><%= myurls[short].id %></a>
+      <li><%= myurls[short].URL%>: <a href="/u/<%= myurls[short].id %>"> <%= myurls[short].id %></a>
         <form method="POST" action="/urls/<%= myurls[short].id %>/delete">
           <input id= "delete" type="submit" value="Delete URL">
         </form>
