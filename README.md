@@ -3,8 +3,8 @@
 
 ## Final Product
 
-!["Login screen"](tinyapp/docs/url_login.png)
-!["URL index"](tinyapp/docs/url_page.png)
+!["Login screen"](https://github.com/ivallee/tinyapp/blob/master/docs/url_login.png?raw=true)
+!["URL index"](https://github.com/ivallee/tinyapp/blob/master/docs/url_page.png?raw=true)
 
 
 ### Dependencies:
