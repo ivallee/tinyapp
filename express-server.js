@@ -56,8 +56,7 @@ app.use((req, res, next) => {
 });
 
 function generateRandomString() {
-  const randomStr = Math.floor((1 + Math.random()) * 0x100000).toString(16);
-  return randomStr;
+  return const randomStr = Math.floor((1 + Math.random()) * 0x100000).toString(16);
 }
 
 function urlsForUser(id) {
@@ -72,7 +71,7 @@ function urlsForUser(id) {
 
 // Index page
 app.get('/', (req, res) => {
-  if (!req.session['user_id']) {
+  if (!res.locals.isLoggedIn) {
     return res.redirect('/login');
   }
   res.redirect("/urls");
@@ -80,7 +79,7 @@ app.get('/', (req, res) => {
 
 // Registration page
 app.get('/register', (req, res) => {
-  if (req.session['user_id']) {
+  if (res.locals.isLoggedIn) {
     return res.redirect('/urls');
   }
   res.render('urls_register');
@@ -88,8 +87,8 @@ app.get('/register', (req, res) => {
 
 // URL index page
 app.get('/urls', (req, res) => {
-  if (!req.session['user_id']) {
-    return res.status(401).send('Please log in or register to view this page');
+  if (!res.locals.isLoggedIn) {
+    return res.status(401).send('Please <a href="/login">log in</a> or <a href="/register">register</a> to view this page');
   }
   res.render('urls_index', {
     myurls: urlsForUser(req.session['user_id'])
@@ -98,7 +97,7 @@ app.get('/urls', (req, res) => {
 
 // Login page
 app.get('/login', (req, res) => {
-  if (req.session['user_id']) {
+  if (res.locals.isLoggedIn) {
     return res.redirect('/urls');
   }
   res.render('urls_login');
@@ -106,7 +105,7 @@ app.get('/login', (req, res) => {
 
 // Shorten url page
 app.get("/urls/new", (req, res) => {
-  if (!req.session['user_id']) {
+  if (!res.locals.isLoggedIn) {
     return res.redirect('/login');
   }
   res.render("urls_new");
@@ -116,18 +115,19 @@ app.get("/urls/new", (req, res) => {
 app.get("/urls/:id", (req, res) => {
   if (!urlDatabase[req.params.id]) {
     return res.status(404).send('Not Found');
+  } else {
+      if (!res.locals.isLoggedIn) {
+        return res.status(401).send('Please <a href="/login">log in</a> or <a href="/register">register</a> to use this app');
+      } else if (req.session['user_id'] !== urlDatabase[req.params.id].userID) {
+        return res.status(401).send('This short URL does not belong to you');
+      } else {
+        const templateVars = {
+          longURL: urlDatabase[req.params.id].URL,
+          shortURL: req.params.id
+        };
+        res.render("urls_show", templateVars);
+      }
   }
-  if (!req.session['user_id']) {
-    return res.status(401).send('Please log in or register to view this page');
-  }
-  if (req.session['user_id'] !== urlDatabase[req.params.id].userID) {
-    return res.status(401).send('This short URL does not belong to you');
-  }
-  const templateVars = {
-    longURL: urlDatabase[req.params.id].URL,
-    shortURL: req.params.id
-  };
-  res.render("urls_show", templateVars);
 });
 
 // Redirect shortURL to longURL
@@ -135,52 +135,54 @@ app.get("/u/:shortURL", (req, res) => {
   if (req.params.shortURL in urlDatabase) {
     const longURL = urlDatabase[req.params.shortURL]['URL'];
     return res.redirect(302, longURL);
+  } else {
+    res.status(404).send('Not Found');
   }
-  res.status(404).send('Not Found');
 });
 
 // Handles registration
 app.post('/register', (req, res) => {
   if (!req.body.email || !req.body.password) {
     return res.status(400).send('Please enter a valid email and password');
-  }
-  for (const key in users) {
-    if (users[key].email === req.body.email) {
-      return res.status(400).send('User already exists');
+  } else {
+    for (const key in users) {
+      if (users[key].email === req.body.email) {
+        return res.status(400).send('User already exists');
+      }
     }
+    const randomid = generateRandomString();
+    users[randomid] = {
+      id: randomid,
+      email: req.body.email,
+      password: bcrypt.hashSync(req.body.password, 10)
+    };
+    req.session.user_id = randomid;
+    res.redirect('/urls');
   }
-  const randomid = generateRandomString();
-  users[randomid] = {
-    id: randomid,
-    email: req.body.email,
-    password: bcrypt.hashSync(req.body.password, 10)
-  };
-  req.session.user_id = randomid;
-  res.redirect('/urls');
 });
 
 
 // Respond to new URL submission
 app.post("/urls", (req, res) => {
-  if (!req.session['user_id']) {
-    return res.status(401, 'Please log in or register to submit a URL');
+  if (res.locals.isLoggedIn) {
+    const randomid = generateRandomString();
+    urlDatabase[randomid] = { id: randomid, URL: req.body.longURL, userID: req.session['user_id'] };
+    return res.redirect(302, `/urls/${randomid}`);
+  } else {
+      res.status(401, 'Please log in or register to submit a URL');
   }
-  const randomid = generateRandomString();
-  urlDatabase[randomid] = { id: randomid, URL: req.body.longURL, userID: req.session['user_id'] };
-  res.redirect(302, `/urls/${randomid}`);
 });
 
 // Respond to login and set cookie
 app.post("/login", (req, res) => {
   for (const key in users) {
-    if (users[key].email === req.body.email) {
-      if (bcrypt.compareSync(req.body.password, users[key].password)) {
-        req.session.user_id = users[key].id;
-        return res.redirect('/urls');
-      }
+    if (users[key].email === req.body.email && bcrypt.compareSync(req.body.password, users[key].password)) {
+      req.session.user_id = users[key].id;
+      return res.redirect('/urls');
+    } else {
+      res.status(401).send('Please enter a valid email and password');
     }
   }
-  res.status(401).send('Please enter a valid username and password');
 });
 
 // Respond to logout
@@ -195,7 +197,7 @@ app.post("/urls/:id", (req, res) => {
     urlDatabase[req.params.id].URL = req.body.longURL;
     return res.redirect(302, "/urls");
   } else {
-    return res.status(401).send('Not authorized');
+    res.status(401).send('Not authorized');
   }
 });
 
