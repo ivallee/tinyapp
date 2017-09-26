@@ -116,17 +116,17 @@ app.get("/urls/:id", (req, res) => {
   if (!urlDatabase[req.params.id]) {
     return res.status(404).send('Not Found');
   } else {
-      if (!res.locals.isLoggedIn) {
-        return res.status(401).send('Please <a href="/login">log in</a> or <a href="/register">register</a> to use this app');
-      } else if (req.session['user_id'] !== urlDatabase[req.params.id].userID) {
-        return res.status(401).send('This short URL does not belong to you');
-      } else {
-        const templateVars = {
-          longURL: urlDatabase[req.params.id].URL,
-          shortURL: req.params.id
-        };
-        res.render("urls_show", templateVars);
-      }
+    if (!res.locals.isLoggedIn) {
+      return res.status(401).send('Please <a href="/login">log in</a> or <a href="/register">register</a> to use this app');
+    } else if (req.session['user_id'] !== urlDatabase[req.params.id].userID) {
+      return res.status(401).send('This short URL does not belong to you');
+    } else {
+      const templateVars = {
+        longURL: urlDatabase[req.params.id].URL,
+        shortURL: req.params.id
+      };
+      res.render("urls_show", templateVars);
+    }
   }
 });
 
@@ -169,7 +169,7 @@ app.post("/urls", (req, res) => {
     urlDatabase[randomid] = { id: randomid, URL: req.body.longURL, userID: req.session['user_id'] };
     return res.redirect(302, `/urls/${randomid}`);
   } else {
-      res.status(401, 'Please log in or register to submit a URL');
+    res.status(401, 'Please log in or register to submit a URL');
   }
 });
 
