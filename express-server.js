@@ -56,7 +56,7 @@ app.use((req, res, next) => {
 });
 
 function generateRandomString() {
-  return const randomStr = Math.floor((1 + Math.random()) * 0x100000).toString(16);
+  return randomStr = Math.floor((1 + Math.random()) * 0x100000).toString(16);
 }
 
 function urlsForUser(id) {
@@ -179,10 +179,9 @@ app.post("/login", (req, res) => {
     if (users[key].email === req.body.email && bcrypt.compareSync(req.body.password, users[key].password)) {
       req.session.user_id = users[key].id;
       return res.redirect('/urls');
-    } else {
-      res.status(401).send('Please enter a valid email and password');
     }
   }
+  res.status(401).send('Please enter a valid email and password');
 });
 
 // Respond to logout
